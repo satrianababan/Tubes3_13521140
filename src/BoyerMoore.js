@@ -14,7 +14,7 @@ function FindMin(x, y) {
     }
 }
 
-function BoyerMooreMatch(text, pattern) {
+export function BoyerMooreMatch(text, pattern) {
     const last = BuildLast(pattern);
     // console.log(last);
     let text_length = text.length;
@@ -55,10 +55,13 @@ function BoyerMooreMatch(text, pattern) {
     return (-1); //NO MATCH
 }
 
-var text = "Aku adalah anak gembala, selalu riang serta gembira";
-var pattern = "selalu";
 
-let x = BoyerMooreMatch(text, pattern);
+
+// // TESTING
+// var text = "Aku adalah anak gembala, selalu riang serta gembira";
+// var pattern = "selalu";
+
+// let x = BoyerMooreMatch(text, pattern);
 // console.log("text:" + text.length);
 // console.log("pattern:" + pattern.length);
-console.log(x);
+// console.log(x);

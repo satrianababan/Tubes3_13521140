@@ -28,11 +28,27 @@ function levenshteinDistance(str1, str2) {
   
     // The final result is the value in the bottom-right cell of the table
     return dp[m][n];
-  }
-  
-  // Test the function
-  const str1 = "kitten";
-  const str2 = "sitting";
-  const distance = levenshteinDistance(str1, str2);
-  console.log(`The Levenshtein Distance between "${str1}" and "${str2}" is ${distance}`);
-  
+}
+
+function getMaxLength(str1, str2) {
+    if (str1.length > str2.length) {
+        return (str1.length);
+    } else {
+        return (str2.length);
+    }
+}
+
+export function similarityPercentage(str1, str2) {
+    let maximum = getMaxLength(str1, str2);
+    let same = (maximum - levenshteinDistance(str1, str2)) / maximum
+    return (same);
+}
+
+
+
+// // TESTING
+// const str1 = "kitten";
+// const str2 = "sitting";
+// const distance = levenshteinDistance(str1, str2);
+// console.log(`The Levenshtein Distance between "${str1}" and "${str2}" is ${distance}`);
+// console.log(similarityPercentage(str1, str2)); 
