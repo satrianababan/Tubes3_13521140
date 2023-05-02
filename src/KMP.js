@@ -1,4 +1,4 @@
-function KMP(test,kalimat){
+export function KMP(test,kalimat){
     var simpan1 = test.toLowerCase();
     var simpan2 = kalimat.toLowerCase();
     var indekshasil = [];
@@ -63,10 +63,10 @@ function borderFunct(text){
         while(max<text.length)
         {
             var simpan = 0;
-            arrpref = [];
+            let arrpref = [];
             for (let i = 0;i <= max ;i++) {//prefix
                 arrpref.push(text[i]);
-                arrsuf = [];
+                let arrsuf = [];
                 var acuan;
                 if(max-i == 0){
                     acuan = 1;
@@ -105,11 +105,11 @@ function tandaKMP(pat,txt){
     hasil += txt.substring(indeksakhir,txt.length);
     return hasil;
 }
-var txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est labor Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est labor Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est labor Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est labor Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est labor .";
-var pat = "labor";
-var indeks =  KMP(pat, txt);
-var hasil = tandaKMP(pat,txt);
-console.log(hasil);
 
 
-
+// // TESTING
+// var txt = "siapa wakil presiden indonesia, presiden indonesia"
+// var pat = "presiden indonesia"
+// var indeks =  KMP(txt, pat);
+// var hasil = tandaKMP(pat,txt);
+// console.log(indeks);
