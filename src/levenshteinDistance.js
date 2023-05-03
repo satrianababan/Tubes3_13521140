@@ -40,7 +40,7 @@ function getMaxLength(str1, str2) {
     }
 }
 
-function similarityPercentage(str1, str2) {
+export function similarityPercentage(str1, str2) {
     let maximum = getMaxLength(str1, str2);
     let same = (maximum - levenshteinDistance(str1, str2)) / maximum
     return (same);
