@@ -64,27 +64,47 @@ async function answerQuestion(quest) {
 async function answerQuestionKMP(quest) {
     // const [result] = await pool.query("SELECT jawaban FROM question WHERE pertanyaan LIKE '" + quest + "'");
     const [all] = await pool.query("SELECT * FROM question");
-    
-    for (let i = 0; i < all.length; i++) {
-        let KMPResult = KMP(quest, all[i].pertanyaan);
-        if (KMPResult.length != 0) {
-            console.log(all[i].jawaban);
-            return; //Pertanyaan tepat dan sudah terjawab
-        }
-    }
-    
-    //PERTANYAAN BELUM TERJAWAB
-    let similarityList = [];
+    let maximum = -1;
+    let index = -1;
+    let found = false;
 
     for (let i = 0; i < all.length; i++) {
-        let similarity = similarityPercentage(quest, all[i].pertanyaan);
-        if (similarity >= 0.6) {
-            similarityList.push(all[i].pertanyaan);
+        let KMPResult = KMP(quest, all[i].pertanyaan);
+        let similarity = similarityPercentage(all[i].pertanyaan, quest);
+
+        if (KMPResult != []) {
+            if (found == false) {
+                maximum = similarity;
+                index = i;
+                found = true;
+            } else {
+                if (similarity > maximum) {
+                    maximum = similarity;
+                    index = i;
+                }
+            }
+        }
+
+        if (found == false) {
+            if (similarity >= 0.9 && similarity > maximum) {
+                maximum = similarity;
+                index = i;
+            }
         }
     }
+
+    // PERTANYAAN BISA DIJAWAB
+    if (index != -1) {
+        console.log(all[index].jawaban);
+        return;
+    }
+
+
+    // PERTANYAAN MASIH BELUM TERJAWAB
+    all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
     console.log("Mungkin maksud Anda: ");
-    for (let i = 0; i < similarityList.length; i++) {
-        console.log(similarityList[i]);
+    for (let i = 0; i < 3; i++) {
+        console.log(all[i].pertanyaan);
     }
 }
 

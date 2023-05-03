@@ -1,6 +1,8 @@
 function levenshteinDistance(str1, str2) {
     const m = str1.length;
     const n = str2.length;
+    let lowcase1 = str1.toLowerCase();
+    let lowcase2 = str2.toLowerCase();
   
     // Create a 2D array to store the dynamic programming table
     const dp = new Array(m + 1).fill(null).map(() => new Array(n + 1).fill(null));
@@ -17,7 +19,7 @@ function levenshteinDistance(str1, str2) {
     // Fill in the rest of the table using the Levenshtein Distance formula
     for (let i = 1; i <= m; i++) {
       for (let j = 1; j <= n; j++) {
-        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        const cost = lowcase1[i - 1] === lowcase2[j - 1] ? 0 : 1;
         dp[i][j] = Math.min(
           dp[i - 1][j] + 1, // Deletion
           dp[i][j - 1] + 1, // Insertion
@@ -38,7 +40,7 @@ function getMaxLength(str1, str2) {
     }
 }
 
-export function similarityPercentage(str1, str2) {
+function similarityPercentage(str1, str2) {
     let maximum = getMaxLength(str1, str2);
     let same = (maximum - levenshteinDistance(str1, str2)) / maximum
     return (same);
@@ -47,7 +49,7 @@ export function similarityPercentage(str1, str2) {
 
 
 // // TESTING
-// const str1 = "kitten";
+// const str1 = "kiTten";
 // const str2 = "sitting";
 // const distance = levenshteinDistance(str1, str2);
 // console.log(`The Levenshtein Distance between "${str1}" and "${str2}" is ${distance}`);
