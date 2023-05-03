@@ -5,14 +5,14 @@ import mysql from 'mysql2'
 
 const pool = mysql.createPool ({
     host: 'localhost',
-    user: 'root',
-    password: 'ZyuohEagle02',
-    database: 'cobastima'
+    user: '...',
+    password: '...',
+    database: '...'
 }).promise();
 
 
 
-async function answerQuestion(quest) {
+export async function answerQuestionBM(quest) {
     // const [result] = await pool.query("SELECT jawaban FROM question WHERE pertanyaan LIKE '" + quest + "'");
     const [all] = await pool.query("SELECT * FROM question");
     let maximum = -1;
@@ -110,7 +110,42 @@ async function answerQuestionKMP(quest) {
 
 
 
+export async function addQuestion(pertanyaan, jawaban) {
+    await pool.query("INSERT INTO question (pertanyaan, jawaban) VALUES (?, ?)"
+        , [pertanyaan, jawaban]);
+}
+
+
+
+export async function deleteQuestion(pertanyaan) {
+    await pool.query("DELETE FROM question WHERE pertanyaan LIKE '"+ pertanyaan +"'");
+}
+
+
+
+export async function checkPresence(pertanyaan) {
+    const [all] = await pool.query("SELECT * FROM question");
+    for (let i = 0; i < all.length; i++) {
+        if (all[i].pertanyaan == pertanyaan) {
+            return (true);
+        }
+    }
+
+    return (false);
+}
+
+
+
+export async function updateQuestion(pertanyaan, jawaban) {
+    await pool.query("UPDATE question SET jawaban = '" + jawaban 
+        + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
+}
+
+
+
 // TESTING
-let quest = "Apa sih ibukota Indonesia?";
-answerQuestion(quest);
+let quest = "Apa ibukota Indonesia?";
+// const [all] = await pool.query("SELECT * FROM question WHERE pertanyaan LIKE 'anjing makannya apa? '");
+// console.log(all);
+// answerQuestionBM(quest);
 // answerQuestionKMP(quest);
