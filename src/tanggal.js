@@ -1,4 +1,4 @@
-const readline = require('readline');
+import readline from 'readline'
 
 // Create a readline interface for reading input from the user
 const rl = readline.createInterface({
@@ -7,7 +7,7 @@ const rl = readline.createInterface({
 });
 
 // Function to get the day of the week from a date
-function getDayOfWeek(date) {
+export function getDayOfWeek(date) {
   const daysOfWeek = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   return daysOfWeek[date.getDay()];
 }
@@ -33,4 +33,4 @@ function promptInput() {
 }
 
 // Start prompting for input
-promptInput();
+// promptInput();

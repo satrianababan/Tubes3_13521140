@@ -1,4 +1,4 @@
-const readline = require('readline');
+import readline from 'readline'
 
 // Create a readline interface for reading input from the user
 const rl = readline.createInterface({
@@ -7,7 +7,7 @@ const rl = readline.createInterface({
 });
 
 // Function to evaluate a mathematical expression
-function evaluateExpression(expression) {
+export function evaluateExpression(expression) {
   // Replace ^ with ** for exponentiation
   expression = expression.replace(/\^/g, '**');
   // Use eval() to evaluate the expression
@@ -35,5 +35,7 @@ function promptInput() {
   });
 }
 
-// Start prompting for input
-promptInput();
+
+
+// TESTING
+// promptInput();
