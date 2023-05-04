@@ -6,11 +6,9 @@ import mysql from 'mysql2'
 const pool = mysql.createPool ({
     host: 'localhost',
     user: 'root',
-    password: 'ZyuohEagle02',
+    password: '',
     database: 'cobastima'
 }).promise();
-
-
 
 async function answerQuestion(quest) {
     // const [result] = await pool.query("SELECT jawaban FROM question WHERE pertanyaan LIKE '" + quest + "'");
@@ -50,7 +48,6 @@ async function answerQuestion(quest) {
         return;
     }
 
-
     // PERTANYAAN MASIH BELUM TERJAWAB
     all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
     console.log("Mungkin maksud Anda: ");
@@ -58,8 +55,6 @@ async function answerQuestion(quest) {
         console.log(all[i].pertanyaan);
     }
 }
-
-
 
 async function answerQuestionKMP(quest) {
     // const [result] = await pool.query("SELECT jawaban FROM question WHERE pertanyaan LIKE '" + quest + "'");
@@ -87,8 +82,6 @@ async function answerQuestionKMP(quest) {
         console.log(similarityList[i]);
     }
 }
-
-
 
 // TESTING
 let quest = "Apa sih ibukota Indonesia?";

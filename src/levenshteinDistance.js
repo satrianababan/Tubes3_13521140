@@ -25,7 +25,6 @@ function levenshteinDistance(str1, str2) {
         );
       }
     }
-  
     // The final result is the value in the bottom-right cell of the table
     return dp[m][n];
 }
