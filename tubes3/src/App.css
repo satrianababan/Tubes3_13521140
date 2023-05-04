@@ -61,7 +61,7 @@
   position: absolute;
   bottom: 0; left: 0; right: 0;
 }
-.chat-input-textarea {
+input {
   background-color: #40414f;
   width: 90%;
   padding: 12px;
@@ -168,9 +168,9 @@ input:checked + .slider:before {
   cursor: pointer;
   text-align: left;
 }
-.chat-submit {
+#submit {
   position: absolute;
-  bottom: 40px;
+  bottom: 26px;
   right: 0;
   cursor: pointer;
   background-color: #40414f;
@@ -181,3 +181,9 @@ input:checked + .slider:before {
 h3 {
   text-align: center;
 }
+/* .chat-input {
+  background-color: ;
+  padding: 24px;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+} */

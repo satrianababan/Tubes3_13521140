@@ -1,7 +1,42 @@
 import './App.css';
 import './normalize.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 
 function App() {
+  const [input, setInput] = useState("");
+  const [chatLog, setChatLog] = useState([{
+    user: "gpt",
+    message: "I am an AI"
+  }, {
+    user: "me",
+    message: "i am a human"
+  }, {
+    user: "gpt",
+    message: "i am an AI"
+  }
+  ]);
+
+  const getMessages = async () => {
+    const options = {
+      method: 'POST',
+      body: JSON.stringify({
+        message: 'Hello how re you?'
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    try {
+      const response = await fetch('http://localhost:4000/completions', options)
+      const data = await response.json()
+      console.log(data)
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <div className="App">
@@ -44,8 +79,15 @@ function App() {
         </div>
       </div>
         <div className="chat-input">
-          <textarea className="chat-input-textarea" placeholder="Type a message..."></textarea>
-            <input className="chat-submit" type="submit" value="Send" />
+          <form onSubmit={getMessages}>
+            <input 
+              // value={input}
+              placeholder="Type a message"
+              // onChange={(e) => setInput(e.target.value)} 
+              row = "1"
+              />
+          </form>
+          <div id="submit" onClick={getMessages}>Send</div>
         </div>
       </section>
     </div>
