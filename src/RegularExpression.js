@@ -1,4 +1,4 @@
-import { answerQuestionBM, addQuestion, deleteQuestion, checkPresence, updateQuestion } from "./DatabaseAccess.js"
+import { answerQuestionBM, answerQuestionKMP, addQuestion, deleteQuestion, checkPresence, updateQuestion, addChat, newChat } from "./DatabaseAccess.js"
 import { evaluateExpression } from "./kalkulator.js"
 import { getDayOfWeek } from "./tanggal.js"
 
@@ -17,21 +17,29 @@ function processQuery(regexPatternList, query) {
     let category = matchRegEx(regexPatternList, query);
 
     if (category == 0) {
-        console.log("QUERY TANGGAL");
+        // QUERY TANGGAL
         let hasil = query.match(regexPatternList[0][2]);
-        for(let i = 0;i<hasil[0].length;i++){
-            if(hasil[0][i]=='\-' || hasil[0][i]=='\\' || hasil[0][i]=='\.'){
-                hasil[0]=hasil[0].replace(hasil[0][i],'/');
+        for (let i = 0; i < hasil[0].length; i++){
+            if (hasil[0][i]=='\-' || hasil[0][i]=='\\' || hasil[0][i]=='\.'){
+                hasil[0] = hasil[0].replace(hasil[0][i],'/');
             }
         }
         const [day, month, year] = hasil[0].split('/');
         const date = new Date(`${month}/${day}/${year}`);
-        console.log(getDayOfWeek(date));
+
+        let answer = "Hari " + getDayOfWeek(date);
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    
     } else if (category == 1) {
-        console.log("QUERY KALKULATOR");
+        // QUERY KALKULATOR
         let operation = query.match(regexPatternList[1][0]);
-        console.log(evaluateExpression(operation[0]));
+        let answer = "Hasilnya adalah " + (evaluateExpression(operation[0]));
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    
     } else if (category == 2) {
+        // QUERY TAMBAH / UPDATE PERTANYAAN
         let i = 21;
         let pertanyaan = "";
         let jawaban = "";
@@ -45,30 +53,40 @@ function processQuery(regexPatternList, query) {
             jawaban = jawaban + query[j];
         }
 
-        if (checkPresence(pertanyaan) == false) {
+        if (checkPresence(pertanyaan).then(val => val == false)) {
             addQuestion(pertanyaan, jawaban);
-            console.log("Pertanyaan " + pertanyaan + " telah ditambahkan...");
+            let answer = "Pertanyaan " + pertanyaan + " telah ditambahkan...";
+            addChat("me", query, "bot", answer);
+            console.log(answer);
         } else {
             updateQuestion(pertanyaan, jawaban);
-            console.log("Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban);
+            let answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
+            addChat("me", query, "bot", answer);
+            console.log(answer);
         }
+    
     } else if (category == 3) {
-        console.log("QUERY HAPUS PERTANYAAN");
-        if(checkPresence(query.substring(17))==false){
-            console.log("Pertanyaan tidak ditemukan!");
-        }
-        else{
+        // QUERY HAPUS PERTANYAAN
+        if (checkPresence(query.substring(17)).then(val => val == false)) {
+            let answer = "Pertanyaan tidak ditemukan!";
+            addChat("me", query, "bot", answer);
+            console.log(answer);
+        } else {
             deleteQuestion(query.substring(17));
-            console.log("Pertanyaan "+query.substring(17)+" telah dihapus!");
+            let answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
+            addChat("me", query, "bot", answer);
+            console.log(answer);
         }
+    
     } else {
+        // QUERY PERTANYAAN
         answerQuestionBM(query);
     }
 }
 
 
 // // Hasil Gabungan
-function realproccess(query){
+function realProccess(query){
     const regexPattern01 = /(.*)?hari (apa )*(pada |di |untuk )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})(.*)?/gi;
     const regexPattern02 = /(pada )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})(.*)?hari (apa)*(.*)?/gi;
     const regexPattern03 = /(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})/gi;
@@ -86,4 +104,10 @@ function realproccess(query){
 // TESTING 2
 // let query = "hari apa pada tanggal 06-02-2003?";
 // let query = "Berapa hasil dari 2+3";
-// realproccess(query);
+// let query = "tambahkan pertanyaan anjing makannya apa? dengan jawaban anjing makan whiskas";
+// let query = "hapus PerTanyaan siapa anjing saya?";
+// let query = "Hari apa tanggal 04-05-2023?";
+
+// newChat();
+let query = "Tambahkan pertanyaan siapa presiden Indonesia? dengan jawaban Bapak Joko Widodo";
+realProccess(query);

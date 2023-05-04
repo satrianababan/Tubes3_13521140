@@ -5,9 +5,9 @@ import mysql from 'mysql2'
 
 const pool = mysql.createPool ({
     host: 'localhost',
-    user: 'root',
-    password: 'Octavianus_28',
-    database: 'tubes3_stima'
+    user: '...',
+    password: '...',
+    database: '...'
 }).promise();
 
 
@@ -46,22 +46,30 @@ export async function answerQuestionBM(quest) {
 
     // PERTANYAAN BISA DIJAWAB
     if (index != -1) {
-        console.log(all[index].jawaban);
+        let answer = all[index].jawaban;
+        addChat("me", quest, "bot", answer);
+        console.log(answer);
         return;
     }
 
 
     // PERTANYAAN MASIH BELUM TERJAWAB
     all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
-    console.log("Mungkin maksud Anda: ");
+    let answer = "Mungkin maksud Anda:\n";
     for (let i = 0; i < 3; i++) {
-        console.log(all[i].pertanyaan);
+        if (i != 2) {
+            answer = answer + all[i].pertanyaan + "\n";
+        } else {
+            answer = answer + all[i].pertanyaan;
+        }
     }
+    addChat("me", quest, "bot", answer);
+    console.log(answer);
 }
 
 
 
-async function answerQuestionKMP(quest) {
+export async function answerQuestionKMP(quest) {
     // const [result] = await pool.query("SELECT jawaban FROM question WHERE pertanyaan LIKE '" + quest + "'");
     const [all] = await pool.query("SELECT * FROM question");
     let maximum = -1;
@@ -95,17 +103,25 @@ async function answerQuestionKMP(quest) {
 
     // PERTANYAAN BISA DIJAWAB
     if (index != -1) {
-        console.log(all[index].jawaban);
+        let answer = all[index].jawaban;
+        addChat("me", quest, "bot", answer);
+        console.log(answer);
         return;
     }
 
 
     // PERTANYAAN MASIH BELUM TERJAWAB
     all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
-    console.log("Mungkin maksud Anda: ");
+    let answer = "Mungkin maksud Anda:\n";
     for (let i = 0; i < 3; i++) {
-        console.log(all[i].pertanyaan);
+        if (i != 2) {
+            answer = answer + all[i].pertanyaan + "\n";
+        } else {
+            answer = answer + all[i].pertanyaan;
+        }
     }
+    addChat("me", quest, "bot", answer);
+    console.log(answer);
 }
 
 
@@ -126,7 +142,7 @@ export async function deleteQuestion(pertanyaan) {
 export async function checkPresence(pertanyaan) {
     const [all] = await pool.query("SELECT * FROM question");
     for (let i = 0; i < all.length; i++) {
-        if (all[i].pertanyaan == pertanyaan) {
+        if (BoyerMooreMatch(all[i].pertanyaan, pertanyaan) == 0 && similarityPercentage(all[i].pertanyaan, pertanyaan) == 1) {
             return (true);
         }
     }
@@ -143,8 +159,26 @@ export async function updateQuestion(pertanyaan, jawaban) {
 
 
 
-// TESTING
-let quest = "Apa ibukota Indonesia?";
+export async function newChat() {
+    await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id), \"bot\", \"Hai, ada yang bisa saya bantu? :)\" FROM history");
+    
+    const [init] = await pool.query("SELECT chat FROM history WHERE id = (SELECT COUNT(DISTINCT id) FROM history)-1");
+    console.log(init[0].chat);
+}
+
+
+
+// export async function addChat(type, chat) {
+//     await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type + "\", \"" + chat + "\" FROM history");
+// }
+export async function addChat(type1, chat1, type2, chat2) {
+    await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type1 + "\", \"" + chat1 + "\" FROM history");
+    await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type2 + "\", \"" + chat2 + "\" FROM history");
+}
+
+
+// // TESTING
+// let quest = "Apa ibukota Indonesia?";
 // const [all] = await pool.query("SELECT * FROM question WHERE pertanyaan LIKE 'anjing makannya apa? '");
 // console.log(all);
 // answerQuestionBM(quest);
