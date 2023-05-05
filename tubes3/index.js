@@ -1,12 +1,20 @@
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser');
-// const dotenv = require('dotenv');
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use((_, res, next) => {
+  res.set('Access-Control-Allow-Origin', '*'); // or 'localhost:8888'
+  res.set('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS');
+  res.set(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  return next();
+}); // sets headers before route
+const port = 4000;
 
-// Load environment variables from .env file
-// dotenv.config();
-
-// Create a new MongoDB client
 const uri = 'mongodb+srv://satrianababan:5NqJqp4MvUw1xjpn@cluster0.2wfkycp.mongodb.net/?retryWrites=true&w=majority';
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -26,12 +34,6 @@ function openCollection(collectionName) {
   return client.db('tubes3_stima').collection('qna');
 }
 
-
-const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-const port = 6000;
-
 app.get('/qna/get', async (req, res) => {
 
   try {
@@ -41,7 +43,6 @@ app.get('/qna/get', async (req, res) => {
     const collection = db.collection('qna');
 
     const query = {};
-
     const result = await collection.find(query).toArray();
 
     res.send(result);
@@ -85,8 +86,18 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+async function getQnas() {
+  try {
+    const response = await axios.get('http://localhost:3000/qna/get');
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
-// module.exports = {
-//   connect,
-//   openCollection
-// };
+async function printQnas() {
+  const qnas = await getQnas();
+  console.log(qnas); // or do something else with the array
+}
+printQnas();
