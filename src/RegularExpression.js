@@ -1,8 +1,8 @@
-import { answerQuestionBM, answerQuestionKMP, addQuestion, deleteQuestion, checkPresence, addChat, newChat } from "./DatabaseAccess.js"
+import { answerQuestionBM, answerQuestionKMP, addQuestion, deleteQuestion, addChat, newChat } from "./DatabaseAccess.js"
 import { evaluateExpression } from "./kalkulator.js"
 import { getDayOfWeek } from "./tanggal.js"
 
-function matchRegEx(regexPatternList, pattern) {
+export function matchRegEx(regexPatternList, pattern) {
     for (let i = 0; i < regexPatternList.length; i++) {
         for (let j = 0; j < regexPatternList[i].length; j++) {
             if (regexPatternList[i][j].test(pattern) == true) {
@@ -13,7 +13,7 @@ function matchRegEx(regexPatternList, pattern) {
     return (-1); //NOT FOUND
 }
 
-function processQuery(regexPatternList, query) {
+function processQuery(regexPatternList, query, no) {
     let category = matchRegEx(regexPatternList, query);
 
     if (category == 0) {
@@ -61,13 +61,20 @@ function processQuery(regexPatternList, query) {
     
     } else {
         // QUERY PERTANYAAN
-        answerQuestionBM(query);
+        if(no==1){
+            console.log("Algoritma BM");
+            answerQuestionBM(query);
+        }
+        else if(no==2){
+            console.log("Algoritma KMP");
+            answerQuestionKMP(query);
+        }
     }
 }
 
 
 // // Hasil Gabungan
-function realProccess(query){
+export function realProccess(query,no){
     const regexPattern01 = /(.*)?hari (apa )*(pada |di |untuk )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(.*)?/gi;
     const regexPattern02 = /(pada )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(.*)?hari (apa)*(.*)?/gi;
     const regexPattern03 = /(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})/gi;
@@ -76,7 +83,7 @@ function realProccess(query){
     const regexPattern21 = /Tambahkan pertanyaan .+ dengan jawaban .+/gi;
     const regexPattern31 = /Hapus pertanyaan .+/gi;
     const regexPatternList = [[regexPattern01,regexPattern02,regexPattern03], [regexPattern11, regexPattern12], [regexPattern21], [regexPattern31]];
-    processQuery(regexPatternList, query);
+    processQuery(regexPatternList, query,no);
 }
 // console.log(matchRegEx(regexPatternList, "Tanggal 03-12-2022 itu hari apa sih ya? Tolong beritahu saya."));
 // console.log(matchRegEx(regexPatternList, "Hai, tau gak hari apa pada tanggal 06.02.2003?"));

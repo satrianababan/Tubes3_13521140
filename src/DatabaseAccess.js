@@ -56,6 +56,8 @@ export async function answerQuestionBM(quest) {
     // PERTANYAAN MASIH BELUM TERJAWAB
     all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
     let answer = "Mungkin maksud Anda:\n";
+    let panjang = all.length;
+    if (panjang >= 3) {
     for (let i = 0; i < 3; i++) {
         if (i != 2) {
             answer = answer + all[i].pertanyaan + "\n";
@@ -65,6 +67,23 @@ export async function answerQuestionBM(quest) {
     }
     addChat("me", quest, "bot", answer);
     console.log(answer);
+    } else {
+        if(panjang !=0 ){
+        for (let i = 0; i < panjang; i++) {
+            if (i != panjang-1) {
+                answer = answer + all[i].pertanyaan + "\n";
+            } else {
+                answer = answer + all[i].pertanyaan;
+            }
+        }
+        addChat("me", quest, "bot", answer);
+        console.log(answer);
+    }else{
+        addChat("me", quest, "bot", "Maaf, pertanyaan Anda tidak dapat dijawab");
+        console.log("Maaf, pertanyaan Anda tidak dapat dijawab");
+    }
+
+    }
 }
 
 
@@ -113,6 +132,8 @@ export async function answerQuestionKMP(quest) {
     // PERTANYAAN MASIH BELUM TERJAWAB
     all.sort(function(a,b){return similarityPercentage(b.pertanyaan,quest)-similarityPercentage(a.pertanyaan,quest)});
     let answer = "Mungkin maksud Anda:\n";
+    let panjang = all.length;
+    if (panjang >= 3) {
     for (let i = 0; i < 3; i++) {
         if (i != 2) {
             answer = answer + all[i].pertanyaan + "\n";
@@ -122,6 +143,23 @@ export async function answerQuestionKMP(quest) {
     }
     addChat("me", quest, "bot", answer);
     console.log(answer);
+    } else {
+        if(panjang !=0 ){
+        for (let i = 0; i < panjang; i++) {
+            if (i != panjang-1) {
+                answer = answer + all[i].pertanyaan + "\n";
+            } else {
+                answer = answer + all[i].pertanyaan;
+            }
+        }
+        addChat("me", quest, "bot", answer);
+        console.log(answer);
+    }else{
+        addChat("me", quest, "bot", "Maaf, pertanyaan Anda tidak dapat dijawab");
+        console.log("Maaf, pertanyaan Anda tidak dapat dijawab");
+    }
+
+    }
 }
 
 
@@ -141,14 +179,12 @@ export async function addQuestion(query, pertanyaan, jawaban) {
         let Answer = "Pertanyaan " + pertanyaan + " telah ditambahkan..."
         addChat("me", query, "bot", Answer);
         console.log(Answer);
-        setAnswer([...answer, Answer]);
     } else {
         await pool.query("UPDATE question SET jawaban = '" + jawaban 
             + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
         let Answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
         addChat("me", query, "bot", Answer);
         console.log(Answer);
-        setAnswer([...answer, Answer]);
     }
 }
 
@@ -168,34 +204,12 @@ export async function deleteQuestion(query, pertanyaan) {
         let Answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
         addChat("me", query, "bot", Answer);
         console.log(Answer);
-        setAnswer([...answer, Answer]);
     } else {
         let Answer = "Pertanyaan tidak ditemukan!";
         addChat("me", query, "bot", Answer);
         console.log(Answer);
-        setAnswer([...answer, Answer]);
     }
 }
-
-
-
-export async function checkPresence(pertanyaan) {
-    const [all] = await pool.query("SELECT * FROM question");
-    for (let i = 0; i < all.length; i++) {
-        if (BoyerMooreMatch(all[i].pertanyaan, pertanyaan) == 0 && similarityPercentage(all[i].pertanyaan, pertanyaan) == 1) {
-            return (true);
-        }
-    }
-
-    return (false);
-}
-
-
-
-// export async function updateQuestion(pertanyaan, jawaban) {
-//     await pool.query("UPDATE question SET jawaban = '" + jawaban 
-//         + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
-// }
 
 
 
@@ -207,10 +221,6 @@ export async function newChat() {
 }
 
 
-
-// export async function addChat(type, chat) {
-//     await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type + "\", \"" + chat + "\" FROM history");
-// }
 export async function addChat(type1, chat1, type2, chat2) {
     await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type1 + "\", \"" + chat1 + "\" FROM history");
     await pool.query("INSERT INTO history (id, type, chat) SELECT COUNT(DISTINCT id)-1, \"" + type2 + "\", \"" + chat2 + "\" FROM history");
