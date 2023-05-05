@@ -1,4 +1,4 @@
-import { answerQuestionBM, answerQuestionKMP, addQuestion, deleteQuestion, checkPresence, updateQuestion, addChat, newChat } from "./DatabaseAccess.js"
+import { answerQuestionBM, answerQuestionKMP, addQuestion, deleteQuestion, checkPresence, addChat, newChat } from "./DatabaseAccess.js"
 import { evaluateExpression } from "./kalkulator.js"
 import { getDayOfWeek } from "./tanggal.js"
 
@@ -53,30 +53,11 @@ function processQuery(regexPatternList, query) {
             jawaban = jawaban + query[j];
         }
 
-        if (checkPresence(pertanyaan).then(val => val == false)) {
-            addQuestion(pertanyaan, jawaban);
-            let answer = "Pertanyaan " + pertanyaan + " telah ditambahkan...";
-            addChat("me", query, "bot", answer);
-            console.log(answer);
-        } else {
-            updateQuestion(pertanyaan, jawaban);
-            let answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
-            addChat("me", query, "bot", answer);
-            console.log(answer);
-        }
+        addQuestion(query, pertanyaan, jawaban);
     
     } else if (category == 3) {
         // QUERY HAPUS PERTANYAAN
-        if (checkPresence(query.substring(17)).then(val => val == false)) {
-            let answer = "Pertanyaan tidak ditemukan!";
-            addChat("me", query, "bot", answer);
-            console.log(answer);
-        } else {
-            deleteQuestion(query.substring(17));
-            let answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
-            addChat("me", query, "bot", answer);
-            console.log(answer);
-        }
+        deleteQuestion(query, query.substring(17));
     
     } else {
         // QUERY PERTANYAAN
@@ -87,11 +68,11 @@ function processQuery(regexPatternList, query) {
 
 // // Hasil Gabungan
 function realProccess(query){
-    const regexPattern01 = /(.*)?hari (apa )*(pada |di |untuk )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})(.*)?/gi;
-    const regexPattern02 = /(pada )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})(.*)?hari (apa)*(.*)?/gi;
-    const regexPattern03 = /(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2}|\d{4})/gi;
-    const regexPattern11 = /(([0-9])+[\+|\/|\-|\*]+)+([0-9])*/g;
-    const regexPattern12 = /([Bb]erapa ([Hh]asil )?)?(([Hh]asil) (dari))? (([0-9])+[\+|\/|\-|\*]+)+([0-9])*(\?)?/g;
+    const regexPattern01 = /(.*)?hari (apa )*(pada |di |untuk )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(.*)?/gi;
+    const regexPattern02 = /(pada )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(.*)?hari (apa)*(.*)?/gi;
+    const regexPattern03 = /(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})/gi;
+    const regexPattern11 = /(([0-9()])+[\+|\/|\-|\*]+)+([0-9()])*/g;
+    const regexPattern12 = /([Bb]erapa ([Hh]asil )?)?(([Hh]asil) (dari))? (([0-9()])+[\+|\/|\-|\*]+)+([0-9()])*(\?)?/g;
     const regexPattern21 = /Tambahkan pertanyaan .+ dengan jawaban .+/gi;
     const regexPattern31 = /Hapus pertanyaan .+/gi;
     const regexPatternList = [[regexPattern01,regexPattern02,regexPattern03], [regexPattern11, regexPattern12], [regexPattern21], [regexPattern31]];
@@ -109,5 +90,6 @@ function realProccess(query){
 // let query = "Hari apa tanggal 04-05-2023?";
 
 // newChat();
-let query = "Tambahkan pertanyaan siapa presiden Indonesia? dengan jawaban Bapak Joko Widodo";
+let query = "hapus pertanyaan siapa presiden Indonesia?";
+// let query = "Hari apa pada tanggal 5/5/2023";
 realProccess(query);

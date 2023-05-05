@@ -5,9 +5,9 @@ import mysql from 'mysql2'
 
 const pool = mysql.createPool ({
     host: 'localhost',
-    user: '...',
-    password: '...',
-    database: '...'
+    user: 'root',
+    password: 'ZyuohEagle02',
+    database: 'cobastima'
 }).promise();
 
 
@@ -126,15 +126,51 @@ export async function answerQuestionKMP(quest) {
 
 
 
-export async function addQuestion(pertanyaan, jawaban) {
-    await pool.query("INSERT INTO question (pertanyaan, jawaban) VALUES (?, ?)"
-        , [pertanyaan, jawaban]);
+export async function addQuestion(query, pertanyaan, jawaban) {
+    let found = false;
+    const [all] = await pool.query("SELECT * FROM question");
+    for (let i = 0; i < all.length; i++) {
+        if (BoyerMooreMatch(all[i].pertanyaan, pertanyaan) == 0 && similarityPercentage(all[i].pertanyaan, pertanyaan) == 1) {
+            found = true;
+        }
+    }
+
+    if (found == false) {
+        await pool.query("INSERT INTO question (pertanyaan, jawaban) VALUES (?, ?)"
+            , [pertanyaan, jawaban]);
+        let answer = "Pertanyaan " + pertanyaan + " telah ditambahkan..."
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    } else {
+        await pool.query("UPDATE question SET jawaban = '" + jawaban 
+            + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
+        let answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    }
 }
 
 
 
-export async function deleteQuestion(pertanyaan) {
-    await pool.query("DELETE FROM question WHERE pertanyaan LIKE '"+ pertanyaan +"'");
+export async function deleteQuestion(query, pertanyaan) {
+    let found = false;
+    const [all] = await pool.query("SELECT * FROM question");
+    for (let i = 0; i < all.length; i++) {
+        if (BoyerMooreMatch(all[i].pertanyaan, pertanyaan) == 0 && similarityPercentage(all[i].pertanyaan, pertanyaan) == 1) {
+            found = true;
+        }
+    }
+
+    if (found == true) {
+        await pool.query("DELETE FROM question WHERE pertanyaan LIKE '"+ pertanyaan +"'");
+        let answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    } else {
+        let answer = "Pertanyaan tidak ditemukan!";
+        addChat("me", query, "bot", answer);
+        console.log(answer);
+    }
 }
 
 
@@ -152,10 +188,10 @@ export async function checkPresence(pertanyaan) {
 
 
 
-export async function updateQuestion(pertanyaan, jawaban) {
-    await pool.query("UPDATE question SET jawaban = '" + jawaban 
-        + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
-}
+// export async function updateQuestion(pertanyaan, jawaban) {
+//     await pool.query("UPDATE question SET jawaban = '" + jawaban 
+//         + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
+// }
 
 
 
