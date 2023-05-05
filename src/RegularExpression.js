@@ -90,6 +90,6 @@ function realProccess(query){
 // let query = "Hari apa tanggal 04-05-2023?";
 
 // newChat();
-let query = "hapus pertanyaan siapa presiden Indonesia?";
+// let query = "hapus pertanyaan siapa presiden Indonesia?";
 // let query = "Hari apa pada tanggal 5/5/2023";
-realProccess(query);
+// realProccess(query);

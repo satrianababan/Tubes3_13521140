@@ -6,8 +6,8 @@ import mysql from 'mysql2'
 const pool = mysql.createPool ({
     host: 'localhost',
     user: 'root',
-    password: 'ZyuohEagle02',
-    database: 'cobastima'
+    password: '',
+    database: 'tubes_stima'
 }).promise();
 
 
@@ -138,15 +138,17 @@ export async function addQuestion(query, pertanyaan, jawaban) {
     if (found == false) {
         await pool.query("INSERT INTO question (pertanyaan, jawaban) VALUES (?, ?)"
             , [pertanyaan, jawaban]);
-        let answer = "Pertanyaan " + pertanyaan + " telah ditambahkan..."
-        addChat("me", query, "bot", answer);
-        console.log(answer);
+        let Answer = "Pertanyaan " + pertanyaan + " telah ditambahkan..."
+        addChat("me", query, "bot", Answer);
+        console.log(Answer);
+        setAnswer([...answer, Answer]);
     } else {
         await pool.query("UPDATE question SET jawaban = '" + jawaban 
             + "' WHERE pertanyaan LIKE '" + pertanyaan + "'");
-        let answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
-        addChat("me", query, "bot", answer);
-        console.log(answer);
+        let Answer = "Pertanyaan " + pertanyaan + " sudah ada! Jawaban di-update ke " + jawaban;
+        addChat("me", query, "bot", Answer);
+        console.log(Answer);
+        setAnswer([...answer, Answer]);
     }
 }
 
@@ -163,13 +165,15 @@ export async function deleteQuestion(query, pertanyaan) {
 
     if (found == true) {
         await pool.query("DELETE FROM question WHERE pertanyaan LIKE '"+ pertanyaan +"'");
-        let answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
-        addChat("me", query, "bot", answer);
-        console.log(answer);
+        let Answer = "Pertanyaan "+query.substring(17)+" telah dihapus!";
+        addChat("me", query, "bot", Answer);
+        console.log(Answer);
+        setAnswer([...answer, Answer]);
     } else {
-        let answer = "Pertanyaan tidak ditemukan!";
-        addChat("me", query, "bot", answer);
-        console.log(answer);
+        let Answer = "Pertanyaan tidak ditemukan!";
+        addChat("me", query, "bot", Answer);
+        console.log(Answer);
+        setAnswer([...answer, Answer]);
     }
 }
 
