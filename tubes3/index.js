@@ -34,7 +34,7 @@ function openCollection(collectionName) {
   return client.db('tubes3_stima').collection('qna');
 }
 
-app.get('/qna/get', async (req, res) => {
+app.get('/qna/get/:question', async (req, res) => {
 
   try {
     await client.connect();
@@ -42,6 +42,7 @@ app.get('/qna/get', async (req, res) => {
     const db = client.db('tubes3_stima');
     const collection = db.collection('qna');
 
+    // const query = { question: req.params.question};
     const query = {};
     const result = await collection.find(query).toArray();
 
@@ -86,18 +87,19 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
-async function getQnas() {
-  try {
-    const response = await axios.get('http://localhost:3000/qna/get');
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
+// async function getQnas() {
+//   try {
+//     const response = await axios.get('http://localhost:3000/qna/get');
+//     return response.data;
+//   } catch (error) {
+//     console.error(error);
+//     return null;
+//   }
+// }
 
-async function printQnas() {
-  const qnas = await getQnas();
-  console.log(qnas); // or do something else with the array
-}
-printQnas();
+// module.exports = {getQnas}
+// async function printQnas() {
+//   const qnas = await getQnas();
+//   console.log(qnas); // or do something else with the array
+// }
+// printQnas();

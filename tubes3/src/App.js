@@ -1,6 +1,6 @@
 import './App.css';
 import './normalize.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 //import { answerQuestionBM, addQuestion, deleteQuestion, checkPresence, updateQuestion } from "./DatabaseAccess.js"
 // import { evaluateExpression } from "../src/kalkulator.js"
@@ -9,50 +9,106 @@ import axios from 'axios';
 
 function App() {
   const [input, setInput] = useState("");
-  const [chatLog, setChatLog] = useState([{
-    user: "gpt",
-    message: "hewo aim bongt"
-  }, {
-    user: "me",
-    message: "hewo bongt"
-  }, {
-    user: "gpt",
-    message: "hewo aim bongt"
-  }
+  const [chatLog, setChatLog] = useState([
+    {user: "gpt", 
+    message: "Halo, saya adalah chatbot yang akan membantu anda menemukan jawaban dari pertanyaan anda. Silakan bertanya."},
   ]);
-  const [data, setData] = useState([]);
-  const [answer, setAnswer] = useState([]);
-  const [question, setQuestion] = useState([]);
+  const [ans, setAns] = useState([]);
 
-
-  const createNewChat = (user, message) => {
-    const newChat = {
-      user: user,
-      message: message
+  function similarity(s1, s2) {
+    if (s1 == null || s2 == null) {
+return 0
     }
-    setChatLog(prevLog => [...prevLog, newChat]);
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
   }
 
-  async function getDataFromDB(){
-    const url = "http://localhost:4000/qna/get";
-    const response = await axios.get(url);
-    const data = await response.data;
-    setData(data);
-    console.log(data);
+  function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+  
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+      var lastValue = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i == 0)
+          costs[j] = j;
+        else {
+          if (j > 0) {
+            var newValue = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue),
+                costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0)
+        costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
   }
+
+  function getDataFromDB(question){
+    var encodedInput = encodeURIComponent(question)
+    var url = `/qna/get/${encodedInput}`;
+    axios.get(url, {
+      responseType: 'json'
+    }).then(response => {
+      if(response.status === 200){
+        if (response.data == null){
+          setChatLog(prevLog => [...prevLog, { user: "gpt", message: "Pertanyaan tidak ditemukan, silakan tambahkan pertanyaan"}])
+        } else{
+          if (response.data[0].answer === "Pertanyaan tidak ditemukan, mungkin maksud anda: \n"){
+            var respon = response.data[0].answer
+            for (let i = 1; i < response.data.length; i++) {
+              let elmt = i.toString() + ". " + response.data[i].question;
+              respon = respon + elmt
+              if (i < response.data.length -1){
+                respon = respon + '\n'
+              }
+            }
+            setChatLog(prevLog => [...prevLog, { user: "gpt", message: respon}])
+          } else{
+            // const firstAnswer = response.data[0].answer;
+            // setChatLog(prevLog => [...prevLog, { user: "gpt", message: firstAnswer}])
+            setAns(response.data)
+            console.log(response.data)
+            console.log("dapat jawaban")
+          }
+        }
+      }
+      else{
+        console.log("No question found in database")
+      }
+    })
+  }
+  function clearLog(){
+    setChatLog([]);
+  }
+
+  const newMessageRef = useRef(null)
+
+  const scrollToBottom = () => {
+    newMessageRef.current?.scrollIntoView({ behaviour: "smooth"})
+  }
+
+  useEffect(() => {
+    scrollToBottom()}
+    ,[chatLog]
+  );
   function getDayOfWeek(date) {
     const daysOfWeek = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-
-    // const [day, month, year] = input.split('/');
-    // const date = new Date(`${month}/${day}/${year}`);
-
-    // // Check if the date is valid
-    // if (isNaN(date)) {
-    //   console.log('Input tidak valid. Masukkan tanggal yang valid dengan format dd/mm/yyyy.');
-    // } else {
-    //   const dayOfWeek = getDayOfWeek(date);
-    //   console.log(`Tanggal ${input} adalah hari ${dayOfWeek}.`);
-    // }
     return daysOfWeek[date.getDay()];
   }
   function evaluateExpression(expression) {
@@ -84,9 +140,7 @@ function App() {
     // getAnswerBM(input.toLowerCase());
     setInput("");
   }
-  function clearLog(){
-    setChatLog([]);
-  }
+
 
   function realproccess(query){
     const regexPattern01 = /(.*)?hari (apa )*(pada |di |untuk )*(tanggal )*(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(.*)?/gi;
@@ -125,12 +179,14 @@ function processQuery(regexPatternList, query) {
         const [day, month, year] = hasil[0].split('/');
         const date = new Date(`${month}/${day}/${year}`);
         console.log(getDayOfWeek(date));
-        setAnswer([...answer, getDayOfWeek(date)])
+        // setAnswer([...answer, getDayOfWeek(date)])
+        setChatLog(prevLog => [...prevLog, { user: "gpt", message: getDayOfWeek(date)}]);
     } else if (category == 1) {
         console.log("QUERY KALKULATOR");
         let operation = query.match(regexPatternList[1][0]);
         // console.log(evaluateExpression(operation[0]));
-        setAnswer([...answer, evaluateExpression(operation[0])])
+        // setAnswer([...answer, evaluateExpression(operation[0])])
+        setChatLog(prevLog => [...prevLog, { user: "gpt", message: evaluateExpression(operation[0])}]);
 
     } else if (category == 2) {
         let i = 21;
@@ -163,76 +219,71 @@ function processQuery(regexPatternList, query) {
         //     console.log("Pertanyaan "+query.substring(17)+" telah dihapus!");
         // }
     } else {
+      // console.log(input)
+      let temp =""
+      let temp1 = ""
+      let val1 = 0
+      // console.log("aaa",ans)
+      ans.map((item)=>{
+        const val = similarity(input, item?.pertanyaan)
+        if (val > 0.9){
+          temp = item.jawaban
+        }else{
+          if (val1<val){
+            val1 = val
+            temp1 = item.pertanyaan
+          }
+        }
+      })
+      if (temp!=""){
+        setChatLog(prevLog => [...prevLog, { user: "gpt", message: temp}]);
+      }else{
+        setChatLog(prevLog => [...prevLog, { user: "gpt", message: "mungkin maksud anda "+temp1}]);
+        
+      }
         // answerQuestionBM(query);
+        // console.log("QUERY TIDAK DITEMUKAN");
     }
 }
 
-  return (
-    <div className="App">
-      <aside className="sidemenu">
-        <button onClick={() => {
-          createNewChat();
-          clearLog();
-        }} 
-        className="side-menu-button">
-        <span>+</span>
-          New chat
-        </button>
-        
-        <div className="toggle-button">
-          <input type="checkbox" id="cb1" />
-          <label For="cb1">KMP</label>
-          <input type="checkbox" id="cb2" />
-          <label For="cb2">BM</label>
-        </div>
-      </aside>
-      <section className="chatbox">
+return (
+  <div className="App">
+    <aside className="sidemenu">
+      <div className="side-menu-button" onClick={clearLog}>
+        <span>
+          +
+        </span>
+        New chat
+      </div>
+    </aside>
+    <section className="chatbox">
       <div className="chat-log">
-        {/* {
+        {
           chatLog.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))
-        } */}
-        {/* <div ref={newMessageRef} /> */}
-        <h3>TUBES 3 STIMA</h3>
-        <div className="chat-message">
-        {
-            chatLog.map((message, index) => (
-              <ChatMessage key={index} message={message} />
-            ))
-          }
-          <div className="chat-message-center">
-            <div className="avatar">          
-            </div>
-            <div className="message">
-            </div>
-          </div>
-        </div>
-        {answer.map((message, index) => (
-          <div className="chat-message gpt">
-            <div className="chat-message-center">
-              <div className="avatar gpt">
-                
-              </div>
-                <div className='message'>{message}</div>
-            </div>
-          </div>
-        ))}
+        }
+       
+      
       </div>
-        <div className="chat-input">
+      <div
+        className="chat-input-holder">
           <form onSubmit={handleSubmit}>
-            <input 
+            <input
+              placeholder='Type your input here'
               value={input}
-              name='formdata'
-              placeholder="Type a message"
-              onChange={(e) => setInput(e.target.value)} 
-              row = "1"
-              />
+              onChange={(e) => setInput(e.target.value) }
+              className="chat-input-textarea"
+              rows="1"
+              >
+            </input>
           </form>
-        </div>
-      </section>
-    </div>
-  );
+      </div>
+
+    </section>
+
+  </div>
+);
 }
   const ChatMessage = ({ message }) => {
     return(
